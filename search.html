@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub User Profile Viewer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="script.js">
+    <link rel="stylesheet" href="home.html">
+    <link rel="stylesheet" href="search.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <img src="github-mark-white.png"
+            alt="...">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="home.html">Home</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
+                aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarScroll">
+                <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+                    <li class="nav-item">
+                        <a class="nav-link" href="search.html">Search</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Github User Profile Viewer</h1>
+        <input type="text" id="username" placeholder="Enter GitHub username">
+        <button id="searchBtn">Search</button>
+        <div id="profile">
+            <img id="avatar" alt="">
+            <h2 id="name"></h2>
+            <p id="bio"></p>
+            <p id="location"></p>
+            <p id="repos"></p>
+            <p id="followers"></p>
+            <p id="following"></p>
+            <a id="githubLink" href="#" target="_blank">Access this Github User Profile link after Username Input</a>
+        </div>
+</body>
+</html>
+<script>
+    document.getElementById('searchBtn').addEventListener('click', function () {
+    const username = document.getElementById('username').value;
+    if (username.trim() === '') {
+        alert('Please enter a valid GitHub username.');
+        return;
+    }
+
+    fetch(`https://api.github.com/users/${username}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`GitHub API Error: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const profile = document.getElementById('profile');
+            profile.style.display = 'block';
+            document.getElementById('avatar').src = data.avatar_url;
+            document.getElementById('name').textContent = data.name || data.login;
+            document.getElementById('bio').textContent = data.bio || 'No bio available';
+            document.getElementById('location').textContent = `Location: ${data.location || 'Not specified'}`;
+            document.getElementById('repos').textContent = `Repositories: ${data.public_repos}`;
+            document.getElementById('followers').textContent = `Followers: ${data.followers}`;
+            document.getElementById('following').textContent = `Following: ${data.following}`;
+            document.getElementById('githubLink').href = data.html_url;
+        })
+        .catch(error => {
+            alert(`Failed to fetch user profile: ${error.message}`);
+        });
+});
+</script>
